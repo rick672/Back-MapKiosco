@@ -14,6 +14,9 @@ class EstablecimientoController extends Controller
     public function index()
     {
         //
+        $idUsuario = auth('api')->id();
+        $establecimientos = Establecimiento::with('categoria')->where('user_id', $idUsuario)->paginate(10);
+        return response()->json($establecimientos);
     }
 
 
@@ -28,7 +31,7 @@ class EstablecimientoController extends Controller
         return response()->json([
             'message' => 'Establecimiento creado exitosamente',
             'data' => $establecimiento
-        ]);
+        ], 201);
     }
 
     /**
@@ -37,6 +40,11 @@ class EstablecimientoController extends Controller
     public function show(string $id)
     {
         //
+        $establecimiento = Establecimiento::findOrFail($id);
+        $establecimiento->load('categoria');
+        return response()->json([
+            'data' => $establecimiento
+        ]);
     }
 
 
@@ -46,6 +54,19 @@ class EstablecimientoController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        $establecimiento = Establecimiento::findOrFail($id);
+        if($establecimiento->user_id !== auth('api')->id()){
+            return response()->json([
+                'message' => 'No tienes permiso para actualizar este establecimiento'
+            ], 403);
+        }
+        
+        $establecimiento->update($request->all());
+        $establecimiento->load('categoria');
+        return response()->json([
+            'message' => 'Establecimiento actualizado exitosamente',
+            'data' => $establecimiento
+        ]);
     }
 
     /**
@@ -54,5 +75,16 @@ class EstablecimientoController extends Controller
     public function destroy(string $id)
     {
         //
+        $establecimiento = Establecimiento::findOrFail($id);
+        if($establecimiento->user_id !== auth('api')->id()){
+            return response()->json([
+                'message' => 'No tienes permiso para eliminar este establecimiento'
+            ], 403);
+        }
+
+        $establecimiento->delete();
+        return response()->json([
+            'message' => 'Establecimiento eliminado exitosamente'
+        ]);
     }
 }
