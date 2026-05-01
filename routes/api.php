@@ -8,7 +8,8 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::resource('establecimientos', App\Http\Controllers\Api\EstablecimientoController::class)->except(['create', 'edit']);
-});
 
+});
+    
+Route::resource('establecimientos', App\Http\Controllers\Api\EstablecimientoController::class)->except(['create', 'edit']);
 Route::resource('categorias', App\Http\Controllers\Api\CategoriaController::class);

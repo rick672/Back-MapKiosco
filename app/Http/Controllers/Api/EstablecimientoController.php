@@ -26,7 +26,16 @@ class EstablecimientoController extends Controller
     public function store(Request $request)
     {
         //
-        $establecimiento = Establecimiento::create($request->all());
+        $imagen = request()->file('imagen');
+        $rutaImagen = $imagen->store('img-establecimientos', 'public');
+
+        // return $rutaImagen;
+        // $request->merge(['imagen' => $rutaImagen]);
+
+        $data = $request->all();
+        $data['imagen'] = $rutaImagen;
+
+        $establecimiento = Establecimiento::create($data);
         $establecimiento->load('categoria');
         return response()->json([
             'message' => 'Establecimiento creado exitosamente',
